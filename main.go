@@ -1,7 +1,8 @@
 package main
 
 import (
-	v1 "app-gateway/pb/wallet-service"
+	common "app-gateway/pb/common"
+	walletService "app-gateway/pb/wallet-service"
 	"context"
 	"flag"
 	"github.com/golang/glog"
@@ -36,7 +37,7 @@ func run() error {
 	)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err := v1.RegisterWalletServiceHandlerFromEndpoint(ctx, mux, *grpcWalletServiceEndpoint, opts)
+	err := walletService.RegisterWalletServiceHandlerFromEndpoint(ctx, mux, *grpcWalletServiceEndpoint, opts)
 	if err != nil {
 		return err
 	}
@@ -44,7 +45,7 @@ func run() error {
 }
 
 func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
-	const fallback = `{"code":-1,"message":"failed to marshal error message"}`
+	const fallback = `{"code":-1,"message":"service error"}`
 
 	s := status.Convert(err)
 	pb := s.Proto()
@@ -54,7 +55,16 @@ func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	buf, mErr := marshaler.Marshal(pb)
+	var buf []byte
+	var mErr error
+	if len(pb.Details) > 0 {
+		errorResult := &common.ErrorResult{}
+		if mErr = pb.Details[0].UnmarshalTo(errorResult); mErr == nil {
+			buf, mErr = marshaler.Marshal(errorResult)
+		}
+	} else {
+		buf, mErr = marshaler.Marshal(pb)
+	}
 	if mErr != nil {
 		grpclog.Infof("Failed to marshal error message %q: %v", s, mErr)
 		if _, err := io.WriteString(w, fallback); err != nil {
