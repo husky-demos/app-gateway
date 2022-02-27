@@ -7,6 +7,9 @@ import (
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/status"
+	"io"
 	"net/http"
 )
 
@@ -28,7 +31,9 @@ func run() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux(
+		runtime.WithErrorHandler(errorHandler),
+	)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	err := v1.RegisterWalletServiceHandlerFromEndpoint(ctx, mux, *grpcWalletServiceEndpoint, opts)
@@ -36,4 +41,29 @@ func run() error {
 		return err
 	}
 	return http.ListenAndServe("0.0.0.0:8080", mux)
+}
+
+func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
+	const fallback = `{"code":-1,"message":"failed to marshal error message"}`
+
+	s := status.Convert(err)
+	pb := s.Proto()
+
+	w.Header().Del("Trailer")
+	w.Header().Del("Transfer-Encoding")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	buf, mErr := marshaler.Marshal(pb)
+	if mErr != nil {
+		grpclog.Infof("Failed to marshal error message %q: %v", s, mErr)
+		if _, err := io.WriteString(w, fallback); err != nil {
+			grpclog.Infof("Failed to write response: %v", err)
+		}
+		return
+	}
+
+	if _, err := w.Write(buf); err != nil {
+		grpclog.Infof("Failed to write response: %v", err)
+	}
 }
