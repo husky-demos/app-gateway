@@ -1,0 +1,8 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+    - selector: husky_demos.user_service.v1.UserService.login
+      post: /v1/user/login
+      body: "*"

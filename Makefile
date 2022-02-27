@@ -28,4 +28,23 @@ gen-wallet-service-gateway-pb: gen-wallet-service-pb
       --grpc-gateway_opt grpc_api_configuration=./config/wallet-service.yaml \
       proto/wallet-service/*.proto
 
-gen-all: gen-common-pb gen-wallet-service-gateway-pb
+gen-user-service-pb:
+	rm -rf ./pb/user-service
+	mkdir -p ./pb/user-service
+	protoc --proto_path=./proto/user-service \
+	--go_out=./pb/user-service \
+	--go_opt=paths=source_relative \
+ 	--go-grpc_out=./pb/user-service \
+ 	--go-grpc_opt=paths=source_relative \
+ 	--go-grpc_opt=require_unimplemented_servers=false \
+ 	proto/user-service/*.proto
+
+gen-user-service-gateway-pb: gen-user-service-pb
+	protoc -I ./proto/user-service \
+      --grpc-gateway_out ./pb/user-service \
+      --grpc-gateway_opt logtostderr=true \
+      --grpc-gateway_opt paths=source_relative \
+      --grpc-gateway_opt grpc_api_configuration=./config/user-service.yaml \
+      proto/user-service/*.proto
+
+gen-all: gen-common-pb gen-wallet-service-gateway-pb gen-user-service-gateway-pb

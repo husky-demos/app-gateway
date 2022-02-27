@@ -1,0 +1,23 @@
+syntax = "proto3";
+package husky_demos.user_service.v1;
+option go_package = "github.com/husky-demos/user-service/v1";
+option java_package = "com.github.husky_demos.user_service.v1";
+
+message User{
+  string id = 1;
+  string nickName = 2;
+  string loginName = 3;
+  string loginPass = 4;
+  bool  isLocking = 5;
+}
+
+message LoginRequest{
+  string loginName = 1;
+  string loginPass = 2;
+}
+
+message LoginResult{
+  User user = 1;
+  string token = 2;
+  int64 expireTime = 3;
+}

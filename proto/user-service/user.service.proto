@@ -1,0 +1,10 @@
+syntax = "proto3";
+package husky_demos.user_service.v1;
+option go_package = "github.com/husky-demos/user-service/v1";
+option java_package = "com.github.husky_demos.user_service.v1";
+
+import "user.model.proto";
+
+service UserService{
+  rpc login(LoginRequest)returns(LoginResult){};
+}
