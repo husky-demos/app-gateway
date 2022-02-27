@@ -67,7 +67,7 @@ func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.
 			buf, mErr = marshaler.Marshal(errorResult)
 		}
 	} else {
-		buf, mErr = marshaler.Marshal(pb)
+		mErr = err
 	}
 	if mErr != nil {
 		grpclog.Infof("Failed to marshal error message %q: %v", s, mErr)
