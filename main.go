@@ -2,6 +2,7 @@ package main
 
 import (
 	common "app-gateway/pb/common"
+	userService "app-gateway/pb/user-service"
 	walletService "app-gateway/pb/wallet-service"
 	"context"
 	"flag"
@@ -16,6 +17,7 @@ import (
 
 var (
 	grpcWalletServiceEndpoint = flag.String("grpc-wallet-service-endpoint", "localhost:9000", "grpc wallet service endpoint")
+	grpcUserServiceEndpoint   = flag.String("grpc-user-service-endpoint", "localhost:9001", "grpc user service endpoint")
 )
 
 func main() {
@@ -37,8 +39,10 @@ func run() error {
 	)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	err := walletService.RegisterWalletServiceHandlerFromEndpoint(ctx, mux, *grpcWalletServiceEndpoint, opts)
-	if err != nil {
+	if err := walletService.RegisterWalletServiceHandlerFromEndpoint(ctx, mux, *grpcWalletServiceEndpoint, opts); err != nil {
+		return err
+	}
+	if err := userService.RegisterUserServiceHandlerFromEndpoint(ctx, mux, *grpcUserServiceEndpoint, opts); err != nil {
 		return err
 	}
 	return http.ListenAndServe("0.0.0.0:8080", mux)
