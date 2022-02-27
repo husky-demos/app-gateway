@@ -2,8 +2,6 @@ syntax = "proto3";
 package husky_demos.wallet_service.v1;
 option go_package = "github.com/husky-demos/wallet-service/v1";
 option java_package = "com.github.husky_demos.wallet_service.v1";
-option java_multiple_files = false;
-option java_outer_classname = "WalletService";
 
 import "wallet.model.proto";
 
