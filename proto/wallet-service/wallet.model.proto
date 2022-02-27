@@ -1,0 +1,19 @@
+syntax = "proto3";
+package husky_demos.wallet_service.v1;
+option go_package = "github.com/husky-demos/wallet-service/v1";
+option java_package = "com.github.husky_demos.wallet_service.v1";
+option java_multiple_files = false;
+option java_outer_classname = "WalletModel";
+
+message Id{
+  string value = 1;
+}
+
+message Wallet{
+  string id = 1;
+  string userId = 2;
+  string coinTypeId = 3;
+  double availableBalance = 4;
+  double freezeBalance = 5;
+  bool isLocking = 6;
+}
