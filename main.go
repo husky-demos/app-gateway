@@ -9,7 +9,6 @@ import (
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 	"io"
 	"net/http"
@@ -23,7 +22,6 @@ var (
 func main() {
 	flag.Parse()
 	defer glog.Flush()
-
 	if err := run(); err != nil {
 		glog.Fatal(err)
 	}
@@ -72,15 +70,15 @@ func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.
 		mErr = err
 	}
 	if mErr != nil {
-		grpclog.Infof("Failed to marshal error message %q: %v", s, mErr)
+		glog.Infof("Failed to marshal error message %q: %v", s, mErr)
 		if _, err := io.WriteString(w, fallback); err != nil {
-			grpclog.Infof("Failed to write response: %v", err)
+			glog.Infof("Failed to write response: %v", err)
 		}
 		return
 	}
 
 	if _, err := w.Write(buf); err != nil {
-		grpclog.Infof("Failed to write response: %v", err)
+		glog.Infof("Failed to write response: %v", err)
 	}
 }
 func incomingHeaderMatcherHandler(key string) (string, bool) {
