@@ -47,4 +47,23 @@ gen-user-service-gateway-pb: gen-user-service-pb
       --grpc-gateway_opt grpc_api_configuration=./config/user-service.yaml \
       proto/user-service/*.proto
 
-gen-all: gen-common-pb gen-wallet-service-gateway-pb gen-user-service-gateway-pb
+gen-user-service-go-pb:
+	rm -rf ./pb/user-service-go
+	mkdir -p ./pb/user-service-go
+	protoc --proto_path=./proto/user-service-go \
+	--go_out=./pb/user-service-go \
+	--go_opt=paths=source_relative \
+ 	--go-grpc_out=./pb/user-service-go \
+ 	--go-grpc_opt=paths=source_relative \
+ 	--go-grpc_opt=require_unimplemented_servers=false \
+ 	proto/user-service-go/*.proto
+
+gen-user-service-go-gateway-pb: gen-user-service-go-pb
+	protoc -I ./proto/user-service-go \
+      --grpc-gateway_out ./pb/user-service-go \
+      --grpc-gateway_opt logtostderr=true \
+      --grpc-gateway_opt paths=source_relative \
+      --grpc-gateway_opt grpc_api_configuration=./config/user-service-go.yaml \
+      proto/user-service-go/*.proto
+
+gen-all: gen-common-pb gen-wallet-service-gateway-pb gen-user-service-gateway-pb gen-user-service-go-gateway-pb
