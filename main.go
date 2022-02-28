@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"net/http"
 )
@@ -37,7 +36,8 @@ func run() error {
 
 	mux := runtime.NewServeMux(
 		runtime.WithErrorHandler(errorHandler),
-		runtime.WithForwardResponseOption(responseHandler),
+		runtime.WithIncomingHeaderMatcher(incomingHeaderMatcherHandler),
+		runtime.WithOutgoingHeaderMatcher(outgoingHeaderMatcherHandler),
 	)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
@@ -83,8 +83,14 @@ func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.
 		grpclog.Infof("Failed to write response: %v", err)
 	}
 }
-
-func responseHandler(ctx context.Context, w http.ResponseWriter, m proto.Message) error {
-	delete(w.Header(), "Grpc-Metadata-Content-Type")
-	return nil
+func incomingHeaderMatcherHandler(key string) (string, bool) {
+	switch key {
+	case "User-Token":
+		return key, true
+	default:
+		return runtime.DefaultHeaderMatcher(key)
+	}
+}
+func outgoingHeaderMatcherHandler(key string) (string, bool) {
+	return key, true
 }
