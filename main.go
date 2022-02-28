@@ -84,12 +84,7 @@ func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.
 	}
 }
 func incomingHeaderMatcherHandler(key string) (string, bool) {
-	switch key {
-	case "User-Token":
-		return key, true
-	default:
-		return runtime.DefaultHeaderMatcher(key)
-	}
+	return runtime.DefaultHeaderMatcher(key)
 }
 func outgoingHeaderMatcherHandler(key string) (string, bool) {
 	return key, true
