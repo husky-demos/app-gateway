@@ -47,7 +47,7 @@ func run() error {
 	if err := userService.RegisterUserServiceHandlerFromEndpoint(ctx, mux, *grpcUserServiceEndpoint, opts); err != nil {
 		return err
 	}
-	return http.ListenAndServe("0.0.0.0:8080", mux)
+	return http.ListenAndServe("0.0.0.0:8080", handler(mux))
 }
 
 func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.Marshaler, w http.ResponseWriter, r *http.Request, err error) {
@@ -88,4 +88,13 @@ func incomingHeaderMatcherHandler(key string) (string, bool) {
 }
 func outgoingHeaderMatcherHandler(key string) (string, bool) {
 	return key, true
+}
+
+func handler(mux *runtime.ServeMux) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,Accept,Authorization")
+		mux.ServeHTTP(w, r)
+	}
 }
