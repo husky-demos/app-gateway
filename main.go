@@ -59,7 +59,7 @@ func errorHandler(ctx context.Context, mux *runtime.ServeMux, marshaler runtime.
 	w.Header().Del("Trailer")
 	w.Header().Del("Transfer-Encoding")
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusInternalServerError)
 
 	var buf []byte
 	var mErr error
