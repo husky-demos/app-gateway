@@ -4,5 +4,4 @@ config_version: 3
 http:
   rules:
     - selector: husky_demos.wallet_service.v1.WalletService.queryByUserId
-      post: /v1/wallet/queryByUserId
-      body: "*"
+      get: /v1/wallet/queryByUserId/{value}
