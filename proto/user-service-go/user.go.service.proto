@@ -7,4 +7,5 @@ import "user.go.model.proto";
 
 service UserService{
   rpc login(LoginRequest)returns(LoginResult){};
+  rpc testResult(LoginRequest) returns(CommonResult){}; // 返回一个LoginResult
 }

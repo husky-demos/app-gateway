@@ -4,6 +4,7 @@ option go_package = "github.com/husky-demos/user-service-go/v1";
 option java_package = "com.github.husky_demos.user_service_go.v1";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
 
 message User{
   string id = 1;
@@ -22,4 +23,10 @@ message LoginResult{
   User user = 1;
   string token = 2;
   google.protobuf.Timestamp expireTime = 3;
+}
+
+message CommonResult{
+  uint32 code = 1;
+  string message = 2;
+  google.protobuf.Any data = 3;
 }

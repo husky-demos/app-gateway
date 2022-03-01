@@ -6,3 +6,6 @@ http:
     - selector: husky_demos.user_service_go.v1.UserService.login
       post: /v1/user-go/login
       body: "*"
+    - selector: husky_demos.user_service_go.v1.UserService.testResult
+      post: /v1/user-go/testResult
+      body: "*"
